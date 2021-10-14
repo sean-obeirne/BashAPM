@@ -16,13 +16,17 @@ tx=$(ifstat | grep "ens33" | awk '{print $8;exit;}');
 echo "RX Data rate: ${rx}B/S" 
 echo "TX Data rate: ${tx}B/S"
 }
+
+spawn_processes(){
 ./project1_executables/APM1 192.168.28.2 &
 ./project1_executables/APM2 192.168.28.2 &
 ./project1_executables/APM3 192.168.28.2 &
 ./project1_executables/APM4 192.168.28.2 &
 ./project1_executables/APM5 192.168.28.2 &
 ./project1_executables/APM6 192.168.28.2 &
+}
 
+spawn_processes
 j=1
 sec=1
 sleep 1
@@ -54,5 +58,3 @@ killall -9 APM3
 killall -9 APM4
 killall -9 APM5
 killall -9 APM6
-
-
