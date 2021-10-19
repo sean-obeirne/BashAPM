@@ -64,7 +64,7 @@ do
    sec=$((sec + 1))
 
    # check if we have executed long enough
-   if [ $sec -eq $1 ]
+   if [ $sec -gt $1 ]
    then
       cleanup
       cont=0
