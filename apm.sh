@@ -20,34 +20,6 @@ spawn_processes(){
    ifstat -a -d 1 ens33
 }
 
-get_stuff(){
-   # out to console 
-   # FOR DEBUGGING
-   #echo "$sec seconds"
-   #for (( i = 1; i <= $PROCS; i++ ))
-   #{
-      #ps u -C "APM$i" | grep "APM" | awk '{print $3 " " $4}'
-   #}
-   #ifstat | grep "ens33" | awk '{print $6 " " $7}'
-   #iostat | grep "sda" | awk '{print $4}'
-   #df -hm / | grep "root" | awk '{print $4}'
-
-
-   # out to file
-   # proc-level metrics
-   for (( i = 1; i <= $PROCS; i++ ))
-   {
-      echo -n "$sec," >> 'APM'$i'_metrics.csv'
-      ps u -C "APM$i" | grep "APM" | awk '{printf $3 "," $4 "\n"}' >> APM$i'_'metrics.csv
-   }
-   
-   # system-level metrics
-   echo -n "$sec," >> system_metrics.csv
-   ifstat -t 1 | grep "ens33" | awk '{printf $6 "," $7 ","}' >> system_metrics.csv
-   iostat | grep "sda" | awk '{printf $4 ","}' >>  system_metrics.csv
-   df -hm / | grep "root" | awk '{printf $4 "\n"}' >> system_metrics.csv
-}
-
 cleanup(){
    killall -r "APM[1-6]"
    killall "ifstat"
@@ -66,9 +38,19 @@ while [ $f -eq 1 ];
 do
    if ! (( sec % 5 ));
    then
-      echo "---------------------"
-      get_stuff
-      echo "---------------------"
+      echo $sec
+
+      #process-level metrics
+      for (( i = 1; i <= $PROCS; i++ )){
+         echo -n "$sec," >> 'APM'$i'_metrics.csv'
+         ps u -C "APM$i" | grep "APM" | awk '{printf $3 "," $4 "\n"}' >> APM$i'_'metrics.csv
+      }
+   
+      # system-level metrics
+      echo -n "$sec," >> system_metrics.csv
+      ifstat -t 1 2> /dev/null | grep "ens33" | awk '{printf $6 "," $7 ","}' >> system_metrics.csv
+      iostat | grep "sda" | awk '{printf $4 ","}' >>  system_metrics.csv
+      df -hm / | grep "root" | awk '{printf $4 "\n"}' >> system_metrics.csv
    fi
    sleep 1
    sec=$((sec + 1));
