@@ -45,8 +45,6 @@ while [ $cont -eq 1 ]
 do
    if !(( sec % 5 ))
    then
-      echo "running execution time: $sec seconds"
-
       #process-level metrics
       for (( i = 1; i <= $PROCS; i++ )){
          echo -n "$sec," >> 'APM'$i'_metrics.csv'
@@ -62,11 +60,15 @@ do
 
    sleep 1
    sec=$((sec + 1))
-
-   # check if we have executed long enough
-   if [ $sec -gt $1 ]
+   
+   # optionally define runtime here
+   if [ $# -eq 1 ]
    then
-      cleanup
-      cont=0
+      # check if we have executed long enough
+      if [ $sec -gt $1 ]
+      then
+         cleanup
+         cont=0
+      fi
    fi
 done
