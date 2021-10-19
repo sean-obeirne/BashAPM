@@ -41,9 +41,9 @@ sec=1    # running number of seconds we have been running
 sleep 1
 
 # main execution loop
-while [ $cont -eq 1 ];
+while [ $cont -eq 1 ]
 do
-   if !(( sec % 5 ));
+   if !(( sec % 5 ))
    then
       echo "running execution time: $sec seconds"
 
@@ -61,5 +61,12 @@ do
    fi
 
    sleep 1
-   sec=$((sec + 1));
+   sec=$((sec + 1))
+
+   # check if we have executed long enough
+   if [ $sec -eq $1 ]
+   then
+      cleanup
+      cont=0
+   fi
 done
