@@ -13,7 +13,7 @@ spawn_processes(){
    # spawn procs & create files
    for (( i = 1; i <= $PROCS; i++ ))
    {
-       ./project1_executables/APM$i $ip &
+      ./project1_executables/APM$i $ip &
       touch 'APM'$i'_metrics.csv'
    }
    touch system_metrics.csv
@@ -37,8 +37,8 @@ get_stuff(){
    # proc-level metrics
    for (( i = 1; i <= $PROCS; i++ ))
    {
-      echo "$sec," >> 'APM'$1'_metrics.csv'
-      ps u -C "APM$i" | grep "APM" | awk '{printf $3 "," $4 ","}' >> APM$1'_'metrics.csv
+      echo "$sec," >> 'APM'$i'_metrics.csv'
+      ps u -C "APM$i" | grep "APM" | awk '{printf $3 "," $4 ","}' >> APM$i'_'metrics.csv
    }
    
    # system-level metrics
