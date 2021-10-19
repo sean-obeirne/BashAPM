@@ -17,10 +17,10 @@ spawn_processes(){
 get_stuff(){
    for (( i=0; i<7; i++ ))
    {
-      ps u -C "APM$i" | grep "APM"
+      ps u -C "APM$i" | grep "APM" | awk '{print $3 $4}'
    }
    ifstat | grep "ens33"
-   iostat | grep "sda"
+   iostat -t 1 | grep "sda"
    df -hm / | tail -1
 }
 
