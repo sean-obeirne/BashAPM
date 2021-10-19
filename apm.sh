@@ -19,9 +19,9 @@ get_stuff(){
    {
       ps u -C "APM$i" | grep "APM" | awk '{print $3 " " $4}'
    }
-   ifstat | grep "ens33"
-   iostat -t 1 | grep "sda"
-   df -hm / | tail -1
+   ifstat | grep "ens33" | awk '{print $6 " " $7}'
+   iostat | grep "sda" | awk '{print $4}'
+   df -hm / | grep "root" | awk '{print $4}'
 }
 
 kill_processes(){
