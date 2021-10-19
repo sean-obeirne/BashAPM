@@ -5,17 +5,18 @@
 
 spawn_processes(){
    local ip=$(ifconfig ens33 | grep "inet" | head -1 | cut -f 10 -d " ")
-   ./project1_executables/APM1 $ip &
-   ./project1_executables/APM2 $ip &
-   ./project1_executables/APM3 $ip &
-   ./project1_executables/APM4 $ip &
-   ./project1_executables/APM5 $ip &
-   ./project1_executables/APM6 $ip &
+   for (( i = 0; i < $PROCS; i++ ))
+   {
+       ./project1_executables/APM$i $ip &
+      touch 'APM'$i'_metrics.csv'
+   }
+   touch system_metrics.csv
    ifstat -a -d 1 ens33
 }
 
 get_stuff(){
-   for (( i=0; i<7; i++ ))
+    echo "$sec seconds"
+   for (( i = 0; i < $PROCS; i++ ))
    {
       ps u -C "APM$i" | grep "APM" | awk '{print $3 " " $4}'
    }
@@ -30,6 +31,8 @@ kill_processes(){
 }
 trap kill_processes EXIT
 
+PROCS=7
+
 spawn_processes
 f=1
 sec=1
@@ -39,7 +42,6 @@ do
    if ! (( sec % 5 ));
    then
       echo "---------------------"
-      echo "$sec seconds"
       get_stuff
       echo "---------------------"
    fi
