@@ -37,14 +37,14 @@ get_stuff(){
    for (( i = 1; i <= $PROCS; i++ ))
    {
       echo "$sec," >> 'APM'$1'_metrics.csv'
-      ps u -C "APM$i" | grep "APM" | awk '{print $3 "," $4 ","}' >> APM$1'_'metrics.csv
+      ps u -C "APM$i" | grep "APM" | awk '{printf $3 "," $4 ","}' >> APM$1'_'metrics.csv
    }
    
    # system-level metrics
    echo -n "$sec," >> system_metrics.csv
-   ifstat | grep "ens33" | awk '{print $6 "," $7 ","}' >> system_metrics.csv
-   iostat | grep "sda" | awk '{print $4 ","}' >>  system_metrics.csv
-   df -hm / | grep "root" | awk '{print $4}' >> system_metrics.csv
+   ifstat | grep "ens33" | awk '{printf $6 "," $7 ","}' >> system_metrics.csv
+   iostat | grep "sda" | awk '{printf $4 ","}' >>  system_metrics.csv
+   df -hm / | grep "root" | awk '{printf $4 "\n"}' >> system_metrics.csv
 }
 
 cleanup(){
