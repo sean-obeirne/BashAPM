@@ -8,7 +8,7 @@ spawn_processes(){
    local ip=$(ifconfig ens33 | grep "inet" | head -1 | cut -f 10 -d " ")
 
    # cleanup old metrics files
-   rm APM?_metrics.csv system_metrics.csv
+   rm -f APM?_metrics.csv system_metrics.csv
 
    # spawn procs & create files
    for (( i = 1; i <= $PROCS; i++ ))
@@ -21,7 +21,8 @@ spawn_processes(){
 }
 
 get_stuff(){
-   # out to console FOR DEBUGGING
+   # out to console 
+   # FOR DEBUGGING
    echo "$sec seconds"
    for (( i = 1; i <= $PROCS; i++ ))
    {
@@ -31,8 +32,8 @@ get_stuff(){
    iostat | grep "sda" | awk '{print $4}'
    df -hm / | grep "root" | awk '{print $4}'
 
-   # out to file
 
+   # out to file
    # proc-level metrics
    for (( i = 1; i <= $PROCS; i++ ))
    {
