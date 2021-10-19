@@ -14,9 +14,9 @@ spawn_processes(){
    for (( i = 1; i <= $PROCS; i++ ))
    {
       ./project1_executables/APM$i $ip &
-      touch 'APM'$i'_metrics.csv'
+      echo "seconds,%CPU,%memory" > 'APM'$i'_metrics.csv'
    }
-   touch system_metrics.csv
+   echo "seconds,RX data rate,TX data rate,disk writes,available disk capacity" > system_metrics.csv
    ifstat -a -d 1 ens33
 }
 
