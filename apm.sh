@@ -41,10 +41,10 @@ get_stuff(){
    }
    
    # system-level metrics
-   echo "$sec," >> system_metrics.csv
-   ifstat | grep "ens33" | awk '{print $6 "," $7}' >> system_metrics.csv
+   echo -n "$sec," >> system_metrics.csv
+   ifstat | grep "ens33" | awk '{print $6 "," $7 ","}' >> system_metrics.csv
    iostat | grep "sda" | awk '{print $4 ","}' >>  system_metrics.csv
-   df -hm / | grep "root" | awk '{print $4 "\n"}' >> system_metrics.csv
+   df -hm / | grep "root" | awk '{print $4}' >> system_metrics.csv
 }
 
 cleanup(){
