@@ -4,8 +4,14 @@
 # Sean O'Beirne, Mani Perez, Joshua Sylvester
 
 spawn_processes(){
+   # grab NIC ip
    local ip=$(ifconfig ens33 | grep "inet" | head -1 | cut -f 10 -d " ")
-   for (( i = 0; i < $PROCS; i++ ))
+
+   # cleanup old metrics files
+   rm APM?_metrics.csv system_metrics.csv
+
+   # spawn procs & create files
+   for (( i = 1; i <= $PROCS; i++ ))
    {
        ./project1_executables/APM$i $ip &
       touch 'APM'$i'_metrics.csv'
@@ -15,23 +21,41 @@ spawn_processes(){
 }
 
 get_stuff(){
-    echo "$sec seconds"
-   for (( i = 0; i < $PROCS; i++ ))
+   # out to console FOR DEBUGGING
+   echo "$sec seconds"
+   for (( i = 1; i <= $PROCS; i++ ))
    {
       ps u -C "APM$i" | grep "APM" | awk '{print $3 " " $4}'
    }
    ifstat | grep "ens33" | awk '{print $6 " " $7}'
    iostat | grep "sda" | awk '{print $4}'
    df -hm / | grep "root" | awk '{print $4}'
+
+   # out to file
+
+   # proc-level metrics
+   for (( i = 1; i <= $PROCS; i++ ))
+   {
+      echo "$sec," >> 'APM'$1'_metrics.csv'
+      ps u -C "APM$i" | grep "APM" | awk '{print $3 "," $4 ","}' >> APM$1'_'metrics.csv
+   }
+   
+   # system-level metrics
+   echo "$sec," >> system_metrics.csv
+   ifstat | grep "ens33" | awk '{print $6 "," $7}' >> system_metrics.csv
+   iostat | grep "sda" | awk '{print $4 ","}' >>  system_metrics.csv
+   df -hm / | grep "root" | awk '{print $4 "\n"}' >> system_metrics.csv
 }
 
-kill_processes(){
+cleanup(){
    killall -r "APM[1-6]"
    killall "ifstat"
 }
-trap kill_processes EXIT
 
-PROCS=7
+PROCS=6
+f1="APM1_metrics.csv"
+
+trap cleanup EXIT
 
 spawn_processes
 f=1
