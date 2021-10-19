@@ -37,8 +37,8 @@ get_stuff(){
    # proc-level metrics
    for (( i = 1; i <= $PROCS; i++ ))
    {
-      echo "$sec," >> 'APM'$i'_metrics.csv'
-      ps u -C "APM$i" | grep "APM" | awk '{printf $3 "," $4 ","}' >> APM$i'_'metrics.csv
+      echo -n "$sec," >> 'APM'$i'_metrics.csv'
+      ps u -C "APM$i" | grep "APM" | awk '{printf $3 "," $4 "\n"}' >> APM$i'_'metrics.csv
    }
    
    # system-level metrics
