@@ -23,14 +23,14 @@ spawn_processes(){
 get_stuff(){
    # out to console 
    # FOR DEBUGGING
-   echo "$sec seconds"
-   for (( i = 1; i <= $PROCS; i++ ))
-   {
-      ps u -C "APM$i" | grep "APM" | awk '{print $3 " " $4}'
-   }
-   ifstat | grep "ens33" | awk '{print $6 " " $7}'
-   iostat | grep "sda" | awk '{print $4}'
-   df -hm / | grep "root" | awk '{print $4}'
+   #echo "$sec seconds"
+   #for (( i = 1; i <= $PROCS; i++ ))
+   #{
+      #ps u -C "APM$i" | grep "APM" | awk '{print $3 " " $4}'
+   #}
+   #ifstat | grep "ens33" | awk '{print $6 " " $7}'
+   #iostat | grep "sda" | awk '{print $4}'
+   #df -hm / | grep "root" | awk '{print $4}'
 
 
    # out to file
@@ -43,7 +43,7 @@ get_stuff(){
    
    # system-level metrics
    echo -n "$sec," >> system_metrics.csv
-   ifstat | grep "ens33" | awk '{printf $6 "," $7 ","}' >> system_metrics.csv
+   ifstat -t 1 | grep "ens33" | awk '{printf $6 "," $7 ","}' >> system_metrics.csv
    iostat | grep "sda" | awk '{printf $4 ","}' >>  system_metrics.csv
    df -hm / | grep "root" | awk '{printf $4 "\n"}' >> system_metrics.csv
 }
