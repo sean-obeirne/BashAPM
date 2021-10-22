@@ -20,7 +20,23 @@ spawn_processes(){
    echo "seconds,RX data rate,TX data rate,disk writes,available disk capacity" > system_metrics.csv
 
    # begin ifstat
-   ifstat -a -d 1 ens33
+   ifstat -d 1 ens33
+}
+
+# Grabs Process Metrics
+proc_metrics(){
+   for (( i = 1; i <= $PROCS; i++ )){
+      echo -n "$sec," >> 'APM'$i'_metrics.csv'
+      ps u -C "APM$i" | grep "APM" | awk '{printf $3 "," $4 "\n"}' >> APM$i'_'metrics.csv
+   }
+}
+
+# Grabs System Metrics
+sys_metrics(){
+   echo -n "$sec," >> system_metrics.csv
+   ifstat 2> /dev/null | grep "ens33" | sed 's/K//g' | awk '{printf $6 "," $7 ","}' >> system_metrics.csv
+   iostat | grep "sda" | awk '{printf $4 ","}' >>  system_metrics.csv
+   df -hm / | grep "root" | awk '{printf $4 "\n"}' >> system_metrics.csv
 }
 
 # Trap function
@@ -30,45 +46,31 @@ cleanup(){
    killall "ifstat"
    cont=0
 }
+trap cleanup EXIT
 
 PROCS=6  # constant number of APM processes to spawn
 
-trap cleanup EXIT
 spawn_processes
 
 cont=1   # we execute infinitely until cont is not 1
-sec=1    # running number of seconds we have been running
-sleep 1
+sec=5    # running number of seconds we have been running
+sleep 5
 
 # main execution loop
 while [ $cont -eq 1 ]
 do
-   if !(( sec % 5 ))
-   then
-      #process-level metrics
-      for (( i = 1; i <= $PROCS; i++ )){
-         echo -n "$sec," >> 'APM'$i'_metrics.csv'
-         ps u -C "APM$i" | grep "APM" | awk '{printf $3 "," $4 "\n"}' >> APM$i'_'metrics.csv
-      }
-   
-      # system-level metrics
-      echo -n "$sec," >> system_metrics.csv
-      ifstat -t 1 2> /dev/null | grep "ens33" | awk '{printf $6 "," $7 ","}' >> system_metrics.csv
-      iostat | grep "sda" | awk '{printf $4 ","}' >>  system_metrics.csv
-      df -hm / | grep "root" | awk '{printf $4 "\n"}' >> system_metrics.csv
-   fi
-
-   sleep 1
-   sec=$((sec + 1))
-   
+   proc_metrics
+   sys_metrics
    # optionally define runtime here
    if [ $# -eq 1 ]
    then
       # check if we have executed long enough
-      if [ $sec -gt $1 ]
+      if [ $sec -ge $1 ]
       then
          cleanup
          cont=0
       fi
    fi
+   sleep 5
+   sec=$((sec + 5))
 done
